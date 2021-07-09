@@ -63,28 +63,54 @@ describe('Form test', () => {
         expect(getRes.todos[0].status).toBe(false)
     })
 
-    // it('put test',async()=>{
-    //     const response = await server.inject({
-    //         method:'PUT',
-    //         url:'/api/todos/:id',
-    //         payload:{
-    //             name:'post',
-    //             description:'please success',
-    //             status:false
-    //         }
-    //     })
+    it('put test',async()=>{
+        const response = await server.inject({
+            method:'POST',
+            url:'/api/todos',
+            payload:{
+                name:'put',
+                description:'please',
+                status:false
+            }
+        })
 
-    //     expect(response.statusCode).toBe(201)
-    //     const res :{todo:ITodo} = JSON.parse(response.body)
-    //     expect(res.todo.name).toBe('post')
+        expect(response.statusCode).toBe(201)
+        const res :{todo:ITodo} = JSON.parse(response.body)
+        console.log(`post Todo: ${res}`)
+        const id = res.todo._id
+        const updateByIdResponse = await server.inject({
+            method: 'PUT',
+            url: `/api/todos/${id}`,
+            payload: {
+                status: true
+            }
+        })
+        expect(updateByIdResponse.statusCode).toBe(200)
+        const res2: { todo: ITodo } = JSON.parse(updateByIdResponse.body)
+        expect(res2.todo.name).toBe('put')
+        expect(res2.todo.description).toBe('please')
+        expect(res2.todo.status).toBe(true)
+    })
 
-    //     const getResponse = await server.inject({method:'GET',url:'/api/todos'})
-    //     expect(response.statusCode).toBe(200)
-    //     const getRes :{todos:Array<ITodo>} = JSON.parse(response.body)
-    //     expect(getRes.todos.length).toBe(1)
-    //     expect(getRes.todos[0].name).toBe('post')
-    //     expect(getRes.todos[0].description).toBe('please success')
-    //     expect(getRes.todos[0].status).toBe(false)
-    // })
+    it('delete test', async () => {
+        const response = await server.inject({
+            method: 'POST',
+            url: '/api/todos',
+            payload: {
+                name: 'delete',
+                description: 'success',
+                status: false
+            }
+        })
+
+        const res: { todo: ITodo } = JSON.parse(response.body)
+
+        const id = res.todo._id
+        const deleteByIdResponse = await server.inject({
+            method: 'DELETE',
+            url: `/api/todos/${id}`
+        })
+        expect(deleteByIdResponse.statusCode).toBe(204)
+    })
 
 })
